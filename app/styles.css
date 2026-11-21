@@ -1,0 +1,526 @@
+/* ==========================================================================
+   Project Pulse — dashboard styles
+   Owner: Designer. Built against the shared class contract in
+   docs/project-pulse-plan.md. No external fonts or assets.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design tokens
+   All colors live here so contrast can be tuned in one place.
+   Contrast ratios noted are text-on-background (WCAG 2.x).
+   -------------------------------------------------------------------------- */
+:root {
+  /* Surfaces */
+  --pp-bg: #f1f5f9;               /* page background (slate-100) */
+  --pp-surface: #ffffff;          /* cards */
+  --pp-border: #e2e8f0;           /* hairlines */
+
+  /* Text */
+  --pp-text: #0f172a;             /* 17.9:1 on white */
+  --pp-text-muted: #475569;       /*  7.6:1 on white */
+  --pp-text-label: #64748b;       /*  4.8:1 on white */
+
+  /* Brand / header band */
+  --pp-brand-1: #1e1b4b;          /* indigo-950 */
+  --pp-brand-2: #3730a3;          /* indigo-800 */
+  --pp-brand-3: #0e7490;          /* cyan-700  */
+  --pp-on-brand: #ffffff;         /* ≥ 7:1 across the whole gradient */
+  --pp-on-brand-muted: #e0e7ff;   /* ≥ 6:1 across the whole gradient */
+
+  /* Focus */
+  --pp-focus: #2563eb;            /* 5.2:1 vs white, 3:1+ vs bg (non-text) */
+
+  /* Status badges: dark text on light tint, all well above 4.5:1 */
+  --pp-on-track-bg: #dcfce7;  --pp-on-track-fg: #14532d;  --pp-on-track-dot: #16a34a; /* ~9.0:1 */
+  --pp-at-risk-bg:  #fef3c7;  --pp-at-risk-fg:  #78350f;  --pp-at-risk-dot:  #d97706; /* ~8.2:1 */
+  --pp-blocked-bg:  #fee2e2;  --pp-blocked-fg:  #7f1d1d;  --pp-blocked-dot:  #dc2626; /* ~8.6:1 */
+  --pp-done-bg:     #dbeafe;  --pp-done-fg:     #1e3a8a;  --pp-done-dot:     #2563eb; /* ~8.9:1 */
+  --pp-unknown-bg:  #e5e7eb;  --pp-unknown-fg:  #374151;  --pp-unknown-dot:  #6b7280; /* ~8.4:1 */
+
+  /* Priority (text colors on white) */
+  --pp-priority-high: #9a3412;    /* 7.3:1 — orange-800 */
+  --pp-priority-high-bg: #fff7ed;
+  --pp-priority-medium: #854d0e;  /* 6.9:1 — yellow-800 */
+  --pp-priority-low: #475569;     /* 7.6:1 — slate-600 */
+  --pp-priority-accent: #ea580c;  /* card accent border (non-text) */
+
+  /* Error message */
+  --pp-error-bg: #fef2f2;
+  --pp-error-fg: #991b1b;         /* 7.4:1 on --pp-error-bg */
+  --pp-error-border: #fca5a5;
+
+  /* Shape & depth */
+  --pp-radius-lg: 16px;
+  --pp-radius-md: 12px;
+  --pp-radius-pill: 999px;
+  --pp-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.08);
+  --pp-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.06);
+  --pp-shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12), 0 4px 8px rgba(15, 23, 42, 0.06);
+
+  /* Type scale (1.25 major third) */
+  --pp-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --pp-fs-xs: 0.75rem;    /* 12px labels */
+  --pp-fs-sm: 0.875rem;   /* 14px meta */
+  --pp-fs-base: 1rem;     /* 16px body */
+  --pp-fs-lg: 1.25rem;    /* 20px card title */
+  --pp-fs-xl: clamp(1.75rem, 1.2rem + 2.4vw, 2.5rem); /* h1 */
+
+  /* Spacing */
+  --pp-space-1: 0.25rem;
+  --pp-space-2: 0.5rem;
+  --pp-space-3: 0.75rem;
+  --pp-space-4: 1rem;
+  --pp-space-5: 1.5rem;
+  --pp-space-6: 2rem;
+  --pp-space-7: 3rem;
+
+  --pp-transition: 160ms ease-out;
+}
+
+/* --------------------------------------------------------------------------
+   2. Base
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--pp-bg);
+  color: var(--pp-text);
+  font-family: var(--pp-font);
+  font-size: var(--pp-fs-base);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden; /* belt-and-braces: no sideways scroll at 320px */
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+/* The `hidden` attribute must always win over component display rules
+   (e.g. .dashboard-summary / .dashboard-message use display:flex). */
+[hidden] {
+  display: none !important;
+}
+
+/* Visible, consistent keyboard focus for anything focusable */
+:focus-visible {
+  outline: 3px solid var(--pp-focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   3. Dashboard shell
+   -------------------------------------------------------------------------- */
+.dashboard {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--pp-space-6) var(--pp-space-5) var(--pp-space-7);
+}
+
+/* Header: subtle gradient band with a soft decorative glow */
+.dashboard-header {
+  position: relative;
+  overflow: hidden;
+  padding: var(--pp-space-6) var(--pp-space-6);
+  margin-bottom: var(--pp-space-5);
+  border-radius: var(--pp-radius-lg);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(14, 116, 144, 0.55) 0, transparent 55%),
+    linear-gradient(135deg, var(--pp-brand-1) 0%, var(--pp-brand-2) 100%);
+  color: var(--pp-on-brand);
+  box-shadow: var(--pp-shadow-md);
+}
+
+.dashboard-header h1 {
+  font-size: var(--pp-fs-xl);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+/* Small "pulse" mark before the title — purely decorative CSS */
+.dashboard-header h1::before {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-right: 0.4em;
+  vertical-align: 0.12em;
+  border-radius: 50%;
+  background: #5eead4;
+  box-shadow: 0 0 0 0.18em rgba(94, 234, 212, 0.3);
+}
+
+.dashboard-header p {
+  margin-top: var(--pp-space-2);
+  max-width: 60ch;
+  color: var(--pp-on-brand-muted);
+  font-size: var(--pp-fs-base);
+}
+
+/* Optional counts line under the header */
+.dashboard-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pp-space-2) var(--pp-space-4);
+  margin: 0 0 var(--pp-space-5);
+  padding: var(--pp-space-3) var(--pp-space-4);
+  background: var(--pp-surface);
+  border: 1px solid var(--pp-border);
+  border-radius: var(--pp-radius-md);
+  box-shadow: var(--pp-shadow-sm);
+  color: var(--pp-text-muted);
+  font-size: var(--pp-fs-sm);
+  font-weight: 500;
+}
+
+.dashboard-summary strong {
+  color: var(--pp-text);
+}
+
+/* --------------------------------------------------------------------------
+   4. Project grid
+   Works for <ul role="list"> with <li><article> and for direct <article>s.
+   -------------------------------------------------------------------------- */
+.project-grid {
+  display: grid;
+  /* min() keeps a single column from overflowing on very narrow viewports */
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: var(--pp-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-grid > li {
+  display: flex;   /* lets the article stretch to equal row height */
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-grid > li > .project-card {
+  flex: 1 1 auto;
+}
+
+/* --------------------------------------------------------------------------
+   5. Project card
+   -------------------------------------------------------------------------- */
+.project-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pp-space-3);
+  min-width: 0;
+  padding: var(--pp-space-5);
+  background: var(--pp-surface);
+  border: 1px solid var(--pp-border);
+  border-radius: var(--pp-radius-lg);
+  box-shadow: var(--pp-shadow-md);
+  overflow-wrap: anywhere;
+  word-break: normal;
+  transition:
+    box-shadow var(--pp-transition),
+    border-color var(--pp-transition);
+}
+
+/* Cards are not links/buttons, so hover only deepens the shadow; no lift,
+   which would falsely suggest the card is clickable. */
+.project-card:hover,
+.project-card:focus-within {
+  box-shadow: var(--pp-shadow-lg);
+  border-color: #cbd5e1;
+}
+
+/* If the card itself is made focusable (tabindex), show a clear ring */
+.project-card:focus-visible {
+  outline: 3px solid var(--pp-focus);
+  outline-offset: 3px;
+  border-radius: var(--pp-radius-lg);
+}
+
+/* High priority: distinct left accent bar (in addition to the text label) */
+.project-card--priority-high {
+  border-left: 6px solid var(--pp-priority-accent);
+  padding-left: calc(var(--pp-space-5) - 5px);
+}
+
+.project-card__name {
+  font-size: var(--pp-fs-lg);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--pp-text);
+  overflow-wrap: anywhere;
+}
+
+/* Status + priority row */
+.project-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pp-space-2);
+}
+
+.project-card__owner,
+.project-card__activity,
+.project-card__summary {
+  font-size: var(--pp-fs-sm);
+  color: var(--pp-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.project-card__owner {
+  color: var(--pp-text);
+  font-weight: 500;
+}
+
+.project-card__activity {
+  padding-top: var(--pp-space-3);
+  border-top: 1px solid var(--pp-border);
+}
+
+.project-card__summary {
+  color: var(--pp-text);
+  line-height: 1.6;
+}
+
+/* Muted small-caps-style field label ("Owner", "Recent activity") */
+.project-card__label {
+  display: block;
+  margin-bottom: 2px;
+  font-size: var(--pp-fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pp-text-label);
+}
+
+/* --------------------------------------------------------------------------
+   6. Status badge
+   Text always present; colored dot is a secondary cue.
+   -------------------------------------------------------------------------- */
+.status-badge {
+  --badge-bg: var(--pp-unknown-bg);
+  --badge-fg: var(--pp-unknown-fg);
+  --badge-dot: var(--pp-unknown-dot);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  max-width: 100%;
+  padding: 0.25em 0.75em;
+  border-radius: var(--pp-radius-pill);
+  border: 1px solid var(--pp-border); /* fallback if color-mix unsupported */
+  border: 1px solid color-mix(in srgb, var(--badge-dot) 30%, transparent);
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+  font-size: var(--pp-fs-sm);
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.status-badge::before {
+  content: "";
+  flex: none;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: var(--badge-dot);
+}
+
+.status-badge--on-track { --badge-bg: var(--pp-on-track-bg); --badge-fg: var(--pp-on-track-fg); --badge-dot: var(--pp-on-track-dot); }
+.status-badge--at-risk  { --badge-bg: var(--pp-at-risk-bg);  --badge-fg: var(--pp-at-risk-fg);  --badge-dot: var(--pp-at-risk-dot); }
+.status-badge--blocked  { --badge-bg: var(--pp-blocked-bg);  --badge-fg: var(--pp-blocked-fg);  --badge-dot: var(--pp-blocked-dot); }
+.status-badge--done     { --badge-bg: var(--pp-done-bg);     --badge-fg: var(--pp-done-fg);     --badge-dot: var(--pp-done-dot); }
+.status-badge--unknown  { --badge-bg: var(--pp-unknown-bg);  --badge-fg: var(--pp-unknown-fg);  --badge-dot: var(--pp-unknown-dot); }
+
+/* Blocked gets a square marker so it differs by shape, not only hue */
+.status-badge--blocked::before {
+  border-radius: 1px;
+}
+
+/* Done gets a hollow marker */
+.status-badge--done::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--badge-dot);
+}
+
+/* --------------------------------------------------------------------------
+   7. Priority label
+   Text always visible. Weight, outline style and the card accent carry
+   meaning in addition to color.
+   -------------------------------------------------------------------------- */
+.priority {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  max-width: 100%;
+  padding: 0.2em 0.65em;
+  border-radius: var(--pp-radius-pill);
+  border: 1px solid var(--pp-border);
+  background: var(--pp-surface);
+  color: var(--pp-text-muted);
+  font-size: var(--pp-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.priority--high {
+  border: 2px solid var(--pp-priority-high);
+  background: var(--pp-priority-high-bg);
+  color: var(--pp-priority-high);
+  font-weight: 800;
+}
+
+.priority--medium {
+  border-color: #d6b46a;
+  color: var(--pp-priority-medium);
+  font-weight: 700;
+}
+
+.priority--low {
+  border-style: dashed;
+  border-color: #94a3b8;
+  color: var(--pp-priority-low);
+  font-weight: 500;
+}
+
+.priority--unknown {
+  border-style: dotted;
+  border-color: #94a3b8;
+  color: var(--pp-unknown-fg);
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   8. Loading / empty / error messages
+   -------------------------------------------------------------------------- */
+.dashboard-message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pp-space-3);
+  margin: 0 0 var(--pp-space-5);
+  padding: var(--pp-space-4) var(--pp-space-5);
+  background: var(--pp-surface);
+  border: 1px solid var(--pp-border);
+  border-left: 4px solid var(--pp-focus);
+  border-radius: var(--pp-radius-md);
+  box-shadow: var(--pp-shadow-sm);
+  color: var(--pp-text-muted);
+  font-size: var(--pp-fs-base);
+  overflow-wrap: anywhere;
+}
+
+.dashboard-message:empty {
+  display: none;
+}
+
+.dashboard-message--error {
+  background: var(--pp-error-bg);
+  border-color: var(--pp-error-border);
+  border-left-color: var(--pp-error-fg);
+  color: var(--pp-error-fg);
+  font-weight: 500;
+}
+
+.dashboard-message code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: rgba(15, 23, 42, 0.06);
+  font-size: 0.9em;
+}
+
+/* --------------------------------------------------------------------------
+   9. Responsive
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  .dashboard {
+    padding-top: var(--pp-space-7);
+  }
+
+  .dashboard-header {
+    padding: var(--pp-space-7) var(--pp-space-7);
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding: var(--pp-space-4) var(--pp-space-3) var(--pp-space-6);
+  }
+
+  .dashboard-header {
+    padding: var(--pp-space-5) var(--pp-space-4);
+    border-radius: var(--pp-radius-md);
+  }
+
+  .project-grid {
+    grid-template-columns: 1fr;
+    gap: var(--pp-space-4);
+  }
+
+  .project-card {
+    padding: var(--pp-space-4);
+    border-radius: var(--pp-radius-md);
+  }
+
+  .project-card--priority-high {
+    padding-left: calc(var(--pp-space-4) - 5px);
+  }
+
+  /* Allow long badge text to wrap on very narrow screens */
+  .status-badge,
+  .priority {
+    white-space: normal;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   10. Motion & forced-colors preferences
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+
+}
+
+@media (forced-colors: active) {
+  .project-card,
+  .status-badge,
+  .priority,
+  .dashboard-message {
+    border: 1px solid CanvasText;
+  }
+
+  .project-card--priority-high {
+    border-left-width: 6px;
+  }
+}

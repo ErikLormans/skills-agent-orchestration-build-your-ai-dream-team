@@ -1,0 +1,42 @@
+{
+  "projects": [
+    {
+      "name": "Onboarding Docs Refresh",
+      "owner": "Mona",
+      "status": "On Track",
+      "recentActivity": "Merged the new contributor quick-start guide on Monday.",
+      "priority": "High",
+      "summary": "Rewriting the getting-started docs so new contributors can open their first pull request in under an hour."
+    },
+    {
+      "name": "Accessibility Audit for the Public Component Library and Design Tokens",
+      "owner": "Jordan Lee",
+      "status": "At Risk",
+      "recentActivity": "Contrast review found 12 tokens below WCAG AA; fixes are waiting on design sign-off.",
+      "priority": "High",
+      "summary": "Checking every shared component for keyboard support, focus visibility and color contrast."
+    },
+    {
+      "name": "CI Pipeline Migration",
+      "owner": "Priya Patel",
+      "status": "Blocked",
+      "recentActivity": "Waiting on runner permissions from the platform team.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Release Notes Automation",
+      "owner": "Sam Rivera",
+      "status": "Done",
+      "recentActivity": "Shipped the release-notes generator and closed the tracking issue.",
+      "priority": "Low",
+      "summary": "Generates release notes from merged pull request labels."
+    },
+    {
+      "name": "Community Office Hours",
+      "owner": "Alex Kim",
+      "status": "On Track",
+      "recentActivity": "Scheduled the next three sessions and posted the sign-up form.",
+      "priority": "Low"
+    }
+  ]
+}
